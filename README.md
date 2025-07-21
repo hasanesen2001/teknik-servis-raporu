@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teknik Servis Raporu Sistemi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .signature-box {
+            border: 2px dashed #d1d5db;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .signature-box:hover {
+            border-color: #3b82f6;
+            background-color: #f8fafc;
+        }
+        .signature-filled {
+            border: 2px solid #10b981;
+            background-color: #f0fdf4;
+            color: #059669;
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h1 class="text-3xl font-bold text-gray-800 text-center mb-2">Teknik Servis Raporu Sistemi</h1>
+            <p class="text-gray-600 text-center">Döner Servis Çalışması Yönetimi</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="bg-white rounded-xl shadow-lg p-4 mb-6">
+            <div class="flex flex-wrap gap-2">
+                <button onclick="showPage('newReport')" class="tab-button active px-6 py-3 rounded-lg font-semibold transition-colors">📝 Yeni Rapor</button>
+                <button onclick="showPage('reportList')" class="tab-button px-6 py-3 rounded-lg font-semibold transition-colors bg-gray-100 hover:bg-gray-200">📋 Kayıtlı Raporlar</button>
+            </div>
+        </div>
+
+        <!-- Yeni Rapor Sayfası -->
+        <div id="newReport" class="page active">
+            <!-- Servis Numarası Gösterimi -->
+            <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl shadow-lg p-6 mb-6">
+                <div class="text-center">
+                    <h2 class="text-xl font-semibold mb-2">Servis Numarası</h2>
+                    <div class="text-3xl font-bold" id="currentServiceNumber">SRV-001</div>
+                </div>
+            </div>
+
+            <form id="serviceForm" class="space-y-6">
+                <!-- Tarih ve Saat Bilgileri -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">📅 Tarih ve Saat Bilgileri</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tarih</label>
+                            <input type="date" id="serviceDate" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Ekip Gidiş Saati</label>
+                            <input type="time" id="departureTime" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">İşletmeden Çıkış Saati</label>
+                            <input type="time" id="exitTime" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Orada Kalma Süresi (saat)</label>
+                            <input type="number" id="stayDuration" step="0.5" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Gidilen Mesafe (km)</label>
+                            <input type="number" id="distance" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Müşteri Bilgileri -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">👤 Müşteri Bilgileri</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Ad</label>
+                            <input type="text" id="customerName" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Soyad</label>
+                            <input type="text" id="customerSurname" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">İletişim Numarası</label>
+                            <input type="tel" id="customerPhone" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Adres</label>
+                            <textarea id="customerAddress" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Teknik Ekip -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">👥 Teknik Ekip</h2>
+                    <div id="teamMembers" class="space-y-3">
+                        <div class="flex gap-3">
+                            <input type="text" placeholder="Ekip üyesi adı" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <button type="button" onclick="removeTeamMember(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Sil</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addTeamMember()" class="mt-3 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">+ Ekip Üyesi Ekle</button>
+                </div>
+
+                <!-- Arıza Bilgileri -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">⚠️ Arıza Bilgileri</h2>
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bildirilen Arıza</label>
+                        <textarea id="reportedFault" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Müşteri tarafından bildirilen arıza açıklaması..."></textarea>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tespit Edilen Arızalar</label>
+                        <div id="detectedFaults" class="space-y-3">
+                            <div class="flex gap-3">
+                                <textarea placeholder="Tespit edilen arıza açıklaması" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="2"></textarea>
+                                <button type="button" onclick="removeDetectedFault(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Sil</button>
+                            </div>
+                        </div>
+                        <button type="button" onclick="addDetectedFault()" class="mt-3 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors">+ Arıza Ekle</button>
+                    </div>
+                </div>
+
+                <!-- Değiştirilen Parçalar -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">🔧 Değiştirilen Parçalar</h2>
+                    <div id="replacedParts" class="space-y-3">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <input type="text" placeholder="Parça adı" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <input type="number" placeholder="Adet" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <button type="button" onclick="removeReplacedPart(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Sil</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addReplacedPart()" class="mt-3 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors">+ Parça Ekle</button>
+                </div>
+
+                <!-- Yapılan İşlemler -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">🛠️ Yapılan İşlemler</h2>
+                    <div id="performedActions" class="space-y-3">
+                        <div class="flex gap-3">
+                            <textarea placeholder="Yapılan işlem açıklaması" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="2"></textarea>
+                            <button type="button" onclick="removePerformedAction(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Sil</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addPerformedAction()" class="mt-3 px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors">+ İşlem Ekle</button>
+                </div>
+
+                <!-- Arıza Giderildi mi? -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">✅ Arıza Durumu</h2>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <input type="radio" id="faultFixed" name="faultStatus" value="fixed" class="w-4 h-4 text-green-600">
+                            <label for="faultFixed" class="text-sm font-medium text-gray-700">Arıza tamamen giderildi</label>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <input type="radio" id="faultPartial" name="faultStatus" value="partial" class="w-4 h-4 text-yellow-600">
+                            <label for="faultPartial" class="text-sm font-medium text-gray-700">Arıza kısmen giderildi</label>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <input type="radio" id="faultNotFixed" name="faultStatus" value="notfixed" class="w-4 h-4 text-red-600">
+                            <label for="faultNotFixed" class="text-sm font-medium text-gray-700">Arıza giderilemedi</label>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Açıklama</label>
+                        <textarea id="faultStatusDescription" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Arıza durumu hakkında detaylı açıklama..."></textarea>
+                    </div>
+                </div>
+
+                <!-- İmzalar -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">✍️ İmzalar</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Teslim Eden (Teknisyen)</label>
+                            <input type="text" id="technicianName" placeholder="Ad Soyad" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3">
+                            <div class="signature-box" onclick="toggleSignature('technicianSignature')" id="technicianSignature">
+                                İmza için tıklayın
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Teslim Alan (Müşteri)</label>
+                            <input type="text" id="customerSignatureName" placeholder="Ad Soyad" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3">
+                            <div class="signature-box" onclick="toggleSignature('customerSignature')" id="customerSignature">
+                                İmza için tıklayın
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Butonlar -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button type="button" onclick="saveReport()" class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold">💾 Kaydet</button>
+                    <button type="button" onclick="generateReport()" class="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">📄 Rapor Oluştur</button>
+                    <button type="button" onclick="printReport()" class="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold">🖨️ Yazdır</button>
+                    <button type="reset" onclick="clearForm()" class="px-8 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold">🗑️ Temizle</button>
+                </div>
+            </form>
+
+            <!-- Rapor Önizleme -->
+            <div id="reportPreview" class="hidden bg-white rounded-xl shadow-lg p-8 mt-8">
+                <div class="text-center mb-6">
+                    <h1 class="text-2xl font-bold text-gray-800">TEKNİK SERVİS RAPORU</h1>
+                    <p class="text-gray-600">Döner Servis Çalışması</p>
+                    <p class="text-lg font-semibold text-blue-600 mt-2" id="reportServiceNumber"></p>
+                </div>
+                <div id="reportContent"></div>
+            </div>
+        </div>
+
+        <!-- Kayıtlı Raporlar Sayfası -->
+        <div id="reportList" class="page">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-semibold text-gray-800">Kayıtlı Servis Raporları</h2>
+                    <div class="flex gap-3">
+                        <input type="text" id="searchInput" placeholder="Servis numarası veya müşteri adı ile ara..." class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent w-64">
+                        <button onclick="searchReports()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">🔍 Ara</button>
+                    </div>
+                </div>
+                
+                <div id="reportsList" class="space-y-4">
+                    <div class="text-center text-gray-500 py-8">
+                        <p class="text-lg">Henüz kayıtlı rapor bulunmuyor.</p>
+                        <p class="text-sm mt-2">İlk raporu oluşturmak için "Yeni Rapor" sekmesini kullanın.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rapor Detay Modal -->
+        <div id="reportModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-screen overflow-y-auto">
+                    <div class="p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-2xl font-semibold text-gray-800">Rapor Detayı</h2>
+                            <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                        </div>
+                        <div id="modalContent"></div>
+                        <div class="flex gap-3 mt-6 justify-end">
+                            <button onclick="printModalReport()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">🖨️ Yazdır</button>
+                            <button onclick="deleteReport()" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">🗑️ Sil</button>
+                            <button onclick="closeModal()" class="px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">Kapat</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentServiceNumber = 1;
+        let currentReportId = null;
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            loadServiceNumber();
+            updateCurrentServiceNumber();
+            loadReports();
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('serviceDate').value = today;
+        });
+
+        function loadServiceNumber() {
+            const savedNumber = localStorage.getItem('lastServiceNumber');
+            if (savedNumber) {
+                currentServiceNumber = parseInt(savedNumber) + 1;
+            }
+        }
+
+        function updateCurrentServiceNumber() {
+            const serviceNumberElement = document.getElementById('currentServiceNumber');
+            serviceNumberElement.textContent = SRV-${String(currentServiceNumber).padStart(3, '0')};
+        }
+
+        function showPage(pageId) {
+            // Tüm sayfaları gizle
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Tüm tab butonlarını pasif yap
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+                button.classList.add('bg-gray-100', 'hover:bg-gray-200');
+            });
+            
+            // Seçilen sayfayı göster
+            document.getElementById(pageId).classList.add('active');
+            
+            // Seçilen tab butonunu aktif yap
+            event.target.classList.add('active');
+            event.target.classList.remove('bg-gray-100', 'hover:bg-gray-200');
+            
+            if (pageId === 'reportList') {
+                loadReports();
+            }
+        }
+
+        function saveReport() {
+            const serviceNumber = SRV-${String(currentServiceNumber).padStart(3, '0')};
+            const reportData = collectFormData();
+            reportData.serviceNumber = serviceNumber;
+            reportData.createdDate = new Date().toISOString();
+            reportData.id = Date.now(); // Unique ID
+            
+            // LocalStorage'a kaydet
+            let savedReports = JSON.parse(localStorage.getItem('serviceReports') || '[]');
+            savedReports.push(reportData);
+            localStorage.setItem('serviceReports', JSON.stringify(savedReports));
+            
+            // Servis numarasını güncelle
+            localStorage.setItem('lastServiceNumber', currentServiceNumber.toString());
+            currentServiceNumber++;
+            updateCurrentServiceNumber();
+            
+            // Başarı mesajı
+            alert(Rapor başarıyla kaydedildi!\nServis Numarası: ${serviceNumber});
+            
+            // Formu temizle
+            clearForm();
+        }
+
+        function collectFormData() {
+            const data = {
+                date: document.getElementById('serviceDate').value,
+                departureTime: document.getElementById('departureTime').value,
+                exitTime: document.getElementById('exitTime').value,
+                stayDuration: document.getElementById('stayDuration').value,
+                distance: document.getElementById('distance').value,
+                customerName: document.getElementById('customerName').value,
+                customerSurname: document.getElementById('customerSurname').value,
+                customerPhone: document.getElementById('customerPhone').value,
+                customerAddress: document.getElementById('customerAddress').value,
+                reportedFault: document.getElementById('reportedFault').value,
+                faultStatusDescription: document.getElementById('faultStatusDescription').value,
+                technicianName: document.getElementById('technicianName').value,
+                customerSignatureName: document.getElementById('customerSignatureName').value
+            };
+
+            // Ekip üyelerini topla
+            data.teamMembers = [];
+            document.querySelectorAll('#teamMembers input').forEach(input => {
+                if (input.value.trim()) data.teamMembers.push(input.value.trim());
+            });
+
+            // Tespit edilen arızaları topla
+            data.detectedFaults = [];
+            document.querySelectorAll('#detectedFaults textarea').forEach(textarea => {
+                if (textarea.value.trim()) data.detectedFaults.push(textarea.value.trim());
+            });
+
+            // Değiştirilen parçaları topla
+            data.replacedParts = [];
+            const partRows = document.querySelectorAll('#replacedParts > div');
+            partRows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs[0].value.trim() && inputs[1].value.trim()) {
+                    data.replacedParts.push({
+                        name: inputs[0].value.trim(),
+                        quantity: inputs[1].value.trim()
+                    });
+                }
+            });
+
+            // Yapılan işlemleri topla
+            data.performedActions = [];
+            document.querySelectorAll('#performedActions textarea').forEach(textarea => {
+                if (textarea.value.trim()) data.performedActions.push(textarea.value.trim());
+            });
+
+            // Arıza durumunu al
+            const faultStatus = document.querySelector('input[name="faultStatus"]:checked');
+            data.faultStatus = faultStatus ? faultStatus.value : '';
+
+            // İmza durumlarını al
+            data.technicianSigned = document.getElementById('technicianSignature').classList.contains('signature-filled');
+            data.customerSigned = document.getElementById('customerSignature').classList.contains('signature-filled');
+
+            return data;
+        }
+
+        function loadReports() {
+            const savedReports = JSON.parse(localStorage.getItem('serviceReports') || '[]');
+            const reportsList = document.getElementById('reportsList');
+            
+            if (savedReports.length === 0) {
+                reportsList.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <p class="text-lg">Henüz kayıtlı rapor bulunmuyor.</p>
+                        <p class="text-sm mt-2">İlk raporu oluşturmak için "Yeni Rapor" sekmesini kullanın.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Raporları tarihe göre sırala (en yeni önce)
+            savedReports.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+
+            let html = '';
+            savedReports.forEach(report => {
+                const createdDate = new Date(report.createdDate).toLocaleDateString('tr-TR');
+                const faultStatusText = report.faultStatus === 'fixed' ? 'Giderildi' : 
+                                      report.faultStatus === 'partial' ? 'Kısmen Giderildi' : 
+                                      report.faultStatus === 'notfixed' ? 'Giderilemedi' : 'Belirtilmedi';
+                const statusColor = report.faultStatus === 'fixed' ? 'text-green-600' : 
+                                   report.faultStatus === 'partial' ? 'text-yellow-600' : 
+                                   report.faultStatus === 'notfixed' ? 'text-red-600' : 'text-gray-600';
+
+                html += `
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer" onclick="viewReport(${report.id})">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-4 mb-2">
+                                    <h3 class="text-lg font-semibold text-blue-600">${report.serviceNumber}</h3>
+                                    <span class="text-sm text-gray-500">${createdDate}</span>
+                                    <span class="text-sm font-medium ${statusColor}">${faultStatusText}</span>
+                                </div>
+                                <p class="text-gray-700 font-medium">${report.customerName} ${report.customerSurname}</p>
+                                <p class="text-sm text-gray-600">${report.customerPhone || 'Telefon belirtilmedi'}</p>
+                                <p class="text-sm text-gray-600 mt-1">${report.reportedFault || 'Arıza açıklaması yok'}</p>
+                            </div>
+                            <div class="text-right text-sm text-gray-500">
+                                <p>Tarih: ${report.date || 'Belirtilmedi'}</p>
+                                <p>Mesafe: ${report.distance || '0'} km</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            reportsList.innerHTML = html;
+        }
+
+        function searchReports() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const savedReports = JSON.parse(localStorage.getItem('serviceReports') || '[]');
+            
+            const filteredReports = savedReports.filter(report => 
+                report.serviceNumber.toLowerCase().includes(searchTerm) ||
+                (report.customerName + ' ' + report.customerSurname).toLowerCase().includes(searchTerm) ||
+                report.customerPhone.includes(searchTerm)
+            );
+
+            const reportsList = document.getElementById('reportsList');
+            
+            if (filteredReports.length === 0) {
+                reportsList.innerHTML = `
+                    <div class="text-center text-gray-500 py-8">
+                        <p class="text-lg">Arama kriterinize uygun rapor bulunamadı.</p>
+                        <p class="text-sm mt-2">Farklı bir arama terimi deneyin.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Filtrelenmiş raporları göster
+            filteredReports.sort((a, b) => new Date(b.createdDate) - new Date(a.createdDate));
+
+            let html = '';
+            filteredReports.forEach(report => {
+                const createdDate = new Date(report.createdDate).toLocaleDateString('tr-TR');
+                const faultStatusText = report.faultStatus === 'fixed' ? 'Giderildi' : 
+                                      report.faultStatus === 'partial' ? 'Kısmen Giderildi' : 
+                                      report.faultStatus === 'notfixed' ? 'Giderilemedi' : 'Belirtilmedi';
+                const statusColor = report.faultStatus === 'fixed' ? 'text-green-600' : 
+                                   report.faultStatus === 'partial' ? 'text-yellow-600' : 
+                                   report.faultStatus === 'notfixed' ? 'text-red-600' : 'text-gray-600';
+
+                html += `
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer" onclick="viewReport(${report.id})">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-4 mb-2">
+                                    <h3 class="text-lg font-semibold text-blue-600">${report.serviceNumber}</h3>
+                                    <span class="text-sm text-gray-500">${createdDate}</span>
+                                    <span class="text-sm font-medium ${statusColor}">${faultStatusText}</span>
+                                </div>
+                                <p class="text-gray-700 font-medium">${report.customerName} ${report.customerSurname}</p>
+                                <p class="text-sm text-gray-600">${report.customerPhone || 'Telefon belirtilmedi'}</p>
+                                <p class="text-sm text-gray-600 mt-1">${report.reportedFault || 'Arıza açıklaması yok'}</p>
+                            </div>
+                            <div class="text-right text-sm text-gray-500">
+                                <p>Tarih: ${report.date || 'Belirtilmedi'}</p>
+                                <p>Mesafe: ${report.distance || '0'} km</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            reportsList.innerHTML = html;
+        }
+
+        function viewReport(reportId) {
+            const savedReports = JSON.parse(localStorage.getItem('serviceReports') || '[]');
+            const report = savedReports.find(r => r.id === reportId);
+            
+            if (!report) return;
+            
+            currentReportId = reportId;
+            
+            const faultStatusText = report.faultStatus === 'fixed' ? 'Tamamen Giderildi' : 
+                                   report.faultStatus === 'partial' ? 'Kısmen Giderildi' : 
+                                   report.faultStatus === 'notfixed' ? 'Giderilemedi' : 'Belirtilmedi';
+
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="text-center mb-6">
+                    <h1 class="text-2xl font-bold text-gray-800">TEKNİK SERVİS RAPORU</h1>
+                    <p class="text-gray-600">Döner Servis Çalışması</p>
+                    <p class="text-lg font-semibold text-blue-600 mt-2">${report.serviceNumber}</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div><strong>Tarih:</strong> ${report.date || 'Belirtilmedi'}</div>
+                        <div><strong>Gidiş Saati:</strong> ${report.departureTime || 'Belirtilmedi'}</div>
+                        <div><strong>Çıkış Saati:</strong> ${report.exitTime || 'Belirtilmedi'}</div>
+                        <div><strong>Kalma Süresi:</strong> ${report.stayDuration || 'Belirtilmedi'} saat</div>
+                        <div><strong>Mesafe:</strong> ${report.distance || 'Belirtilmedi'} km</div>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Müşteri Bilgileri</h3>
+                        <div class="text-sm space-y-1">
+                            <div><strong>Ad Soyad:</strong> ${report.customerName} ${report.customerSurname}</div>
+                            <div><strong>Telefon:</strong> ${report.customerPhone || 'Belirtilmedi'}</div>
+                            <div><strong>Adres:</strong> ${report.customerAddress || 'Belirtilmedi'}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Teknik Ekip</h3>
+                        <ul class="text-sm list-disc list-inside">
+                            ${report.teamMembers.map(member => <li>${member}</li>).join('') || '<li>Belirtilmedi</li>'}
+                        </ul>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Bildirilen Arıza</h3>
+                        <p class="text-sm">${report.reportedFault || 'Belirtilmedi'}</p>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Tespit Edilen Arızalar</h3>
+                        <ul class="text-sm list-disc list-inside">
+                            ${report.detectedFaults.map(fault => <li>${fault}</li>).join('') || '<li>Belirtilmedi</li>'}
+                        </ul>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Değiştirilen Parçalar</h3>
+                        <ul class="text-sm list-disc list-inside">
+                            ${report.replacedParts.map(part => <li>${part.name} - ${part.quantity} adet</li>).join('') || '<li>Parça değişimi yapılmadı</li>'}
+                        </ul>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Yapılan İşlemler</h3>
+                        <ul class="text-sm list-disc list-inside">
+                            ${report.performedActions.map(action => <li>${action}</li>).join('') || '<li>Belirtilmedi</li>'}
+                        </ul>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Arıza Durumu</h3>
+                        <p class="text-sm"><strong>Durum:</strong> ${faultStatusText}</p>
+                        <p class="text-sm mt-2">${report.faultStatusDescription || 'Açıklama belirtilmedi'}</p>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-4">İmzalar</h3>
+                        <div class="grid grid-cols-2 gap-8">
+                            <div class="text-center">
+                                <div class="border-b border-gray-400 pb-2 mb-2 h-16 flex items-end justify-center">
+                                    ${report.technicianSigned ? '✓ İmzalandı' : ''}
+                                </div>
+                                <p class="text-sm font-medium">Teslim Eden</p>
+                                <p class="text-sm">${report.technicianName || 'Ad Soyad'}</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="border-b border-gray-400 pb-2 mb-2 h-16 flex items-end justify-center">
+                                    ${report.customerSigned ? '✓ İmzalandı' : ''}
+                                </div>
+                                <p class="text-sm font-medium">Teslim Alan</p>
+                                <p class="text-sm">${report.customerSignatureName || 'Ad Soyad'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('reportModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('reportModal').classList.add('hidden');
+            currentReportId = null;
+        }
+
+        function deleteReport() {
+            if (!currentReportId) return;
+            
+            if (confirm('Bu raporu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
+                let savedReports = JSON.parse(localStorage.getItem('serviceReports') || '[]');
+                savedReports = savedReports.filter(report => report.id !== currentReportId);
+                localStorage.setItem('serviceReports', JSON.stringify(savedReports));
+                
+                closeModal();
+                loadReports();
+                alert('Rapor başarıyla silindi.');
+            }
+        }
+
+        function printModalReport() {
+            const modalContent = document.getElementById('modalContent');
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Teknik Servis Raporu</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .text-center { text-align: center; }
+                        .font-bold { font-weight: bold; }
+                        .border-t { border-top: 1px solid #ccc; }
+                        .pt-4 { padding-top: 16px; }
+                        .mb-2 { margin-bottom: 8px; }
+                        .mb-4 { margin-bottom: 16px; }
+                        .space-y-6 > * + * { margin-top: 24px; }
+                        .grid { display: grid; }
+                        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+                        .gap-4 { gap: 16px; }
+                        .gap-8 { gap: 32px; }
+                        .text-sm { font-size: 14px; }
+                        .list-disc { list-style-type: disc; }
+                        .list-inside { list-style-position: inside; }
+                        .border-b { border-bottom: 1px solid #999; }
+                        .pb-2 { padding-bottom: 8px; }
+                        .h-16 { height: 64px; }
+                        .flex { display: flex; }
+                        .items-end { align-items: flex-end; }
+                        .justify-center { justify-content: center; }
+                    </style>
+                </head>
+                <body>
+                    ${modalContent.innerHTML}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Diğer fonksiyonlar (önceki koddan)
+        function addTeamMember() {
+            const container = document.getElementById('teamMembers');
+            const div = document.createElement('div');
+            div.className = 'flex gap-3';
+            div.innerHTML = `
+                <input type="text" placeholder="Ekip üyesi adı" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <button type="button" onclick="removeTeamMember(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Sil</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeTeamMember(button) {
+            button.parentElement.remove();
+        }
+
+        function addDetectedFault() {
+            const container = document.getElementById('detectedFaults');
+            const div = document.createElement('div');
+            div.className = 'flex gap-3';
+            div.innerHTML = `
+                <textarea placeholder="Tespit edilen arıza açıklaması" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="2"></textarea>
+                <button type="button" onclick="removeDetectedFault(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Sil</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeDetectedFault(button) {
+            button.parentElement.remove();
+        }
+
+        function addReplacedPart() {
+            const container = document.getElementById('replacedParts');
+            const div = document.createElement('div');
+            div.className = 'grid grid-cols-1 md:grid-cols-3 gap-3';
+            div.innerHTML = `
+                <input type="text" placeholder="Parça adı" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <input type="number" placeholder="Adet" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <button type="button" onclick="removeReplacedPart(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Sil</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removeReplacedPart(button) {
+            button.parentElement.remove();
+        }
+
+        function addPerformedAction() {
+            const container = document.getElementById('performedActions');
+            const div = document.createElement('div');
+            div.className = 'flex gap-3';
+            div.innerHTML = `
+                <textarea placeholder="Yapılan işlem açıklaması" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="2"></textarea>
+                <button type="button" onclick="removePerformedAction(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Sil</button>
+            `;
+            container.appendChild(div);
+        }
+
+        function removePerformedAction(button) {
+            button.parentElement.remove();
+        }
+
+        function toggleSignature(id) {
+            const element = document.getElementById(id);
+            if (element.classList.contains('signature-filled')) {
+                element.classList.remove('signature-filled');
+                element.textContent = 'İmza için tıklayın';
+            } else {
+                element.classList.add('signature-filled');
+                element.textContent = '✓ İmzalandı';
+            }
+        }
+
+        function generateReport() {
+            const reportContent = document.getElementById('reportContent');
+            const reportPreview = document.getElementById('reportPreview');
+            const reportServiceNumber = document.getElementById('reportServiceNumber');
+            
+            const serviceNumber = SRV-${String(currentServiceNumber).padStart(3, '0')};
+            reportServiceNumber.textContent = serviceNumber;
+            
+            const data = collectFormData();
+
+            const faultStatusText = data.faultStatus === 'fixed' ? 'Tamamen Giderildi' : 
+                                   data.faultStatus === 'partial' ? 'Kısmen Giderildi' : 
+                                   data.faultStatus === 'notfixed' ? 'Giderilemedi' : 'Belirtilmedi';
+
+            let html = `
+                <div class="space-y-6">
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div><strong>Tarih:</strong> ${data.date || 'Belirtilmedi'}</div>
+                        <div><strong>Gidiş Saati:</strong> ${data.departureTime || 'Belirtilmedi'}</div>
+                        <div><strong>Çıkış Saati:</strong> ${data.exitTime || 'Belirtilmedi'}</div>
+                        <div><strong>Kalma Süresi:</strong> ${data.stayDuration || 'Belirtilmedi'} saat</div>
+                        <div><strong>Mesafe:</strong> ${data.distance || 'Belirtilmedi'} km</div>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Müşteri Bilgileri</h3>
+                        <div class="text-sm space-y-1">
+                            <div><strong>Ad Soyad:</strong> ${data.customerName} ${data.customerSurname}</div>
+                            <div><strong>Telefon:</strong> ${data.customerPhone || 'Belirtilmedi'}</div>
+                            <div><strong>Adres:</strong> ${data.customerAddress || 'Belirtilmedi'}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Teknik Ekip</h3>
+                        <ul class="text-sm list-disc list-inside">
+                            ${data.teamMembers.map(member => <li>${member}</li>).join('') || '<li>Belirtilmedi</li>'}
+                        </ul>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Bildirilen Arıza</h3>
+                        <p class="text-sm">${data.reportedFault || 'Belirtilmedi'}</p>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Tespit Edilen Arızalar</h3>
+                        <ul class="text-sm list-disc list-inside">
+                            ${data.detectedFaults.map(fault => <li>${fault}</li>).join('') || '<li>Belirtilmedi</li>'}
+                        </ul>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Değiştirilen Parçalar</h3>
+                        <ul class="text-sm list-disc list-inside">
+                            ${data.replacedParts.map(part => <li>${part.name} - ${part.quantity} adet</li>).join('') || '<li>Parça değişimi yapılmadı</li>'}
+                        </ul>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Yapılan İşlemler</h3>
+                        <ul class="text-sm list-disc list-inside">
+                            ${data.performedActions.map(action => <li>${action}</li>).join('') || '<li>Belirtilmedi</li>'}
+                        </ul>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-2">Arıza Durumu</h3>
+                        <p class="text-sm"><strong>Durum:</strong> ${faultStatusText}</p>
+                        <p class="text-sm mt-2">${data.faultStatusDescription || 'Açıklama belirtilmedi'}</p>
+                    </div>
+                    
+                    <div class="border-t pt-4">
+                        <h3 class="font-semibold mb-4">İmzalar</h3>
+                        <div class="grid grid-cols-2 gap-8">
+                            <div class="text-center">
+                                <div class="border-b border-gray-400 pb-2 mb-2 h-16 flex items-end justify-center">
+                                    ${data.technicianSigned ? '✓ İmzalandı' : ''}
+                                </div>
+                                <p class="text-sm font-medium">Teslim Eden</p>
+                                <p class="text-sm">${data.technicianName || 'Ad Soyad'}</p>
+                            </div>
+                            <div class="text-center">
+                                <div class="border-b border-gray-400 pb-2 mb-2 h-16 flex items-end justify-center">
+                                    ${data.customerSigned ? '✓ İmzalandı' : ''}
+                                </div>
+                                <p class="text-sm font-medium">Teslim Alan</p>
+                                <p class="text-sm">${data.customerSignatureName || 'Ad Soyad'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            reportContent.innerHTML = html;
+            reportPreview.classList.remove('hidden');
+            reportPreview.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function printReport() {
+            const reportPreview = document.getElementById('reportPreview');
+            if (reportPreview.classList.contains('hidden')) {
+                alert('Önce rapor oluşturun!');
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Teknik Servis Raporu</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .text-center { text-align: center; }
+                        .font-bold { font-weight: bold; }
+                        .border-t { border-top: 1px solid #ccc; }
+                        .pt-4 { padding-top: 16px; }
+                        .mb-2 { margin-bottom: 8px; }
+                        .mb-4 { margin-bottom: 16px; }
+                        .space-y-6 > * + * { margin-top: 24px; }
+                        .grid { display: grid; }
+                        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+                        .gap-4 { gap: 16px; }
+                        .gap-8 { gap: 32px; }
+                        .text-sm { font-size: 14px; }
+                        .list-disc { list-style-type: disc; }
+                        .list-inside { list-style-position: inside; }
+                        .border-b { border-bottom: 1px solid #999; }
+                        .pb-2 { padding-bottom: 8px; }
+                        .h-16 { height: 64px; }
+                        .flex { display: flex; }
+                        .items-end { align-items: flex-end; }
+                        .justify-center { justify-content: center; }
+                    </style>
+                </head>
+                <body>
+                    <div class="text-center mb-4">
+                        <h1 class="font-bold" style="font-size: 24px;">TEKNİK SERVİS RAPORU</h1>
+                        <p>Döner Servis Çalışması</p>
+                        <p style="font-size: 18px; font-weight: bold; color: #3b82f6; margin-top: 8px;">${document.getElementById('reportServiceNumber').textContent}</p>
+                    </div>
+                    ${document.getElementById('reportContent').innerHTML}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        function clearForm() {
+            if (confirm('Tüm verileri silmek istediğinizden emin misiniz?')) {
+                document.getElementById('serviceForm').reset();
+                document.getElementById('reportPreview').classList.add('hidden');
+                
+                // İmza kutularını sıfırla
+                document.getElementById('technicianSignature').classList.remove('signature-filled');
+                document.getElementById('customerSignature').classList.remove('signature-filled');
+                document.getElementById('technicianSignature').textContent = 'İmza için tıklayın';
+                document.getElementById('customerSignature').textContent = 'İmza için tıklayın';
+                
+                // Dinamik alanları sıfırla
+                document.getElementById('teamMembers').innerHTML = `
+                    <div class="flex gap-3">
+                        <input type="text" placeholder="Ekip üyesi adı" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <button type="button" onclick="removeTeamMember(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Sil</button>
+                    </div>
+                `;
+                
+                document.getElementById('detectedFaults').innerHTML = `
+                    <div class="flex gap-3">
+                        <textarea placeholder="Tespit edilen arıza açıklaması" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="2"></textarea>
+                        <button type="button" onclick="removeDetectedFault(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Sil</button>
+                    </div>
+                `;
+                
+                document.getElementById('replacedParts').innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <input type="text" placeholder="Parça adı" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <input type="number" placeholder="Adet" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <button type="button" onclick="removeReplacedPart(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Sil</button>
+                    </div>
+                `;
+                
+                document.getElementById('performedActions').innerHTML = `
+                    <div class="flex gap-3">
+                        <textarea placeholder="Yapılan işlem açıklaması" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" rows="2"></textarea>
+                        <button type="button" onclick="removePerformedAction(this)" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">Sil</button>
+                    </div>
+                `;
+                
+                // Bugünün tarihini tekrar ayarla
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('serviceDate').value = today;
+            }
+        }
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'962ae0262525694e',t:'MTc1MzEwMjc2Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
